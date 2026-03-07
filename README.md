@@ -1,222 +1,253 @@
-
 <p align="center">
-<a href="https://github.com/webfansplz/vite-plugin-vue-inspector"><img src="./logo.svg" width="180" alt="vite-plugin-vue-inspector"></a>
+<a href="https://github.com/aifuqiang02/vite-plugin-vue-inspector"><img src="./logo.svg" width="180" alt="vite-plugin-vue-inspector-ai"></a>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/vite-plugin-vue-inspector" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/npm/v/vite-plugin-vue-inspector" alt="NPM Version" /></a>
-  <a href="https://www.npmjs.com/package/vite-plugin-vue-inspector" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/npm/dt/vite-plugin-vue-inspector" alt="NPM Downloads" /></a>
-  <a href="https://github.com/webfansplz/vite-plugin-vue-inspector/blob/master/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/github/license/webfansplz/vite-plugin-vue-inspector" alt="License" /></a>
+  <a href="https://www.npmjs.com/package/vite-plugin-vue-inspector-ai" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/npm/v/vite-plugin-vue-inspector-ai" alt="NPM Version" /></a>
+  <a href="https://www.npmjs.com/package/vite-plugin-vue-inspector-ai" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/npm/dt/vite-plugin-vue-inspector-ai" alt="NPM Downloads" /></a>
+  <a href="https://github.com/aifuqiang02/vite-plugin-vue-inspector/blob/master/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://badgen.net/github/license/aifuqiang02/vite-plugin-vue-inspector" alt="License" /></a>
 </p>
 
 <p align="center">
 <a href="https://stackblitz.com/edit/vitejs-vite-rbr2as?file=src%2FApp.vue"><img src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt=""></a>
 </p>
 
-## 📖 Introduction
+## 📖 介绍
 
-A vite plugin which provides the ability that to jump to the local IDE when you click the element of browser automatically. It supports Vue2 & 3 & SSR.
+一个 Vite 插件，点击浏览器中的元素即可跳转到本地 IDE 的源代码。支持 Vue2 & 3 & SSR。
+
+**这是 [vite-plugin-vue-inspector](https://github.com/webfansplz/vite-plugin-vue-inspector) 的分支，增加了以下功能：**
+
+- ✅ 复制文件位置（包含起始和结束行）到剪贴板（格式：`file.vue:10:5-20`）
+- ✅ 在检查器浮层中显示结束行信息
 
 <p align="center">
-<img src="./public/preview.gif" alt="vite-plugin-vue-inspector">
+<img src="./public/preview.gif" alt="vite-plugin-vue-inspector-ai">
 </p>
 
-## 📦 Installation
+## 📦 安装
 
 ```bash
 
-# vite-plugin-vue-inspector 
-
-pnpm install vite-plugin-vue-inspector -D
-
-# unplugin-vue-inspector
-
-pnpm install unplugin-vue-inspector -D
+pnpm install vite-plugin-vue-inspector-ai -D
 
 ```
 
-## 🦄 Usage
+## 🦄 使用方法
 
-### Configuration Vite
+### 点击行为
+
+- **默认点击**：复制文件位置到剪贴板（格式：`Vue组件: src/views/WelcomeView.vue | 起始行: 7 | 结束行: 25`，不打开编辑器）
+- **Ctrl + 点击**（或 **Cmd + 点击** on macOS）：打开编辑器 + 复制到剪贴板
+
+### 配置 Vite
 
 ```ts
-// for Vue2
+// Vue3
 
-import { defineConfig, } from 'vite'
-import { createVuePlugin, } from 'vite-plugin-vue2'
+import { defineConfig } from "vite";
+import Vue from "@vitejs/plugin-vue";
 
-import Inspector from 'unplugin-vue-inspector/vite' // OR vite-plugin-vue-inspector
+import Inspector from "vite-plugin-vue-inspector-ai";
+
+export default defineConfig({
+  plugins: [
+    Vue(),
+    Inspector({
+      enabled: true,
+      toggleButtonVisibility: "always",
+    }),
+  ],
+});
+```
+
+```ts
+// Vue2
+
+import { defineConfig } from "vite";
+import { createVuePlugin } from "vite-plugin-vue2";
+
+import Inspector from "vite-plugin-vue-inspector-ai";
 
 export default defineConfig({
   plugins: [
     createVuePlugin(),
     Inspector({
-      vue: 2
+      vue: 2,
+      enabled: true,
+      toggleButtonVisibility: "always",
     }),
   ],
-})
+});
 ```
 
 ```ts
-// for Vue3
-
-import { defineConfig } from 'vite'
-import Vue from '@vitejs/plugin-vue'
-
-import Inspector from 'unplugin-vue-inspector/vite' // OR vite-plugin-vue-inspector
-
-export default defineConfig({
-  plugins: [Vue(), Inspector()],
-})
-```
-
-```ts
-// for Nuxt3
+// Nuxt3
 // nuxt.config.ts
-import { defineNuxtConfig } from 'nuxt/config'
-import Inspector from 'vite-plugin-vue-inspector'
+import { defineNuxtConfig } from "nuxt/config";
+import Inspector from "vite-plugin-vue-inspector-ai";
 
 export default defineNuxtConfig({
   modules: [
-    ['unplugin-vue-inspector/nuxt', {
-      enabled: true,
-      toggleButtonVisibility: 'always',
-    }],
+    [
+      "vite-plugin-vue-inspector-ai/nuxt",
+      {
+        enabled: true,
+        toggleButtonVisibility: "always",
+      },
+    ],
   ],
-})
+});
 ```
 
-### Options
-
+### 配置项
 
 ```ts
 interface VitePluginInspectorOptions {
   /**
-   * Vue version
+   * Vue 版本
    * @default 3
    */
-  vue?: 2 | 3
+  vue?: 2 | 3;
 
   /**
-   * Default enable state
+   * 默认启用状态
    * @default false
    */
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
-   * Define a combo key to toggle inspector
-   * @default 'control-shift' on windows, 'meta-shift' on other os
+   * 定义切换检查器的组合键
+   * @default 'control-shift' (Windows), 'meta-shift' (其他系统)
    *
-   * any number of modifiers `control` `shift` `alt` `meta` followed by zero or one regular key, separated by -
-   * examples: control-shift, control-o, control-alt-s  meta-x control-meta
-   * Some keys have native behavior (e.g. alt-s opens history menu on firefox).
-   * To avoid conflicts or accidentally typing into inputs, modifier only combinations are recommended.
-   * You can also disable it by setting `false`.
+   * 任意数量的修饰符 `control` `shift` `alt` `meta` 加上零个或一个普通键，用 `-` 分隔
+   * 示例: control-shift, control-o, control-alt-s  meta-x control-meta
+   * 某些按键有原生行为（如 Firefox 中 alt-s 打开历史菜单）。
+   * 为避免冲突或意外输入，建议仅使用修饰符组合。
+   * 也可通过设置为 `false` 禁用。
    */
-  toggleComboKey?: string | false
+  toggleComboKey?: string | false;
 
   /**
-   * Toggle button visibility
+   * 切换按钮可见性
    * @default 'active'
    */
-  toggleButtonVisibility?: 'always' | 'active' | 'never'
+  toggleButtonVisibility?: "always" | "active" | "never";
 
   /**
-   * Toggle button display position
+   * 切换按钮显示位置
    * @default top-right
    */
-  toggleButtonPos?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
+  toggleButtonPos?: "top-right" | "top-left" | "bottom-right" | "bottom-left";
 
   /**
-   * append an import to the module id ending with `appendTo` instead of adding a script into body
-   * useful for frameworks that do not support transformIndexHtml hook (e.g. Nuxt3)
+   * 将导入追加到以 `appendTo` 结尾的模块 ID，而不是将脚本添加到 body
+   * 适用于不支持 transformIndexHtml hook 的框架（如 Nuxt3）
    *
-   * WARNING: only set this if you know exactly what it does.
+   * 警告：只有完全了解其作用时才设置此项。
    */
-  appendTo?: string | RegExp
+  appendTo?: string | RegExp;
 
   /**
-   * Customize openInEditor host (e.g. http://localhost:3000)
+   * 自定义打开编辑器的主机（如 http://localhost:3000）
    * @default false
-   * @deprecated This option is deprecated and removed in 5.0. The plugin now automatically detects the correct host.
+   * @deprecated 此选项已在 5.0 版本弃用并移除。插件现在会自动检测正确的主机。
    */
-  openInEditorHost?: string | false
+  openInEditorHost?: string | false;
 
   /**
-   * lazy load inspector times (ms)
-   * @default false
-   */
-  lazyLoad?: number | false
-
-  /**
-   * disable inspector on editor open
+   * 延迟加载检查器的时间（毫秒）
    * @default false
    */
-  disableInspectorOnEditorOpen?: boolean
+  lazyLoad?: number | false;
 
   /**
-   * Hide information in VNode and produce clean html in DevTools
+   * 打开编辑器时禁用检查器
+   * @default false
+   */
+  disableInspectorOnEditorOpen?: boolean;
+
+  /**
+   * 隐藏 VNode 中的信息，在 DevTools 中产生干净的 HTML
    *
-   * Currently, it only works for Vue 3
+   * 目前仅适用于 Vue 3
    *
    * @default true
    */
-  cleanHtml?: boolean
+  cleanHtml?: boolean;
 
   /**
-   * Target editor when open in editor (v5.1.0+)
+   * 打开编辑器时的目标编辑器 (v5.1.0+)
    *
    * @default code (Visual Studio Code)
    */
-  launchEditor?: 'appcode' | 'atom' | 'atom-beta' | 'brackets' | 'clion' | 'code' | 'code-insiders' | 'codium' | 'emacs' | 'idea' | 'notepad++' | 'pycharm' | 'phpstorm' | 'rubymine' | 'sublime' | 'vim' | 'visualstudio' | 'webstorm' | 'cursor'
+  launchEditor?:
+    | "appcode"
+    | "atom"
+    | "atom-beta"
+    | "brackets"
+    | "clion"
+    | "code"
+    | "code-insiders"
+    | "codium"
+    | "emacs"
+    | "idea"
+    | "notepad++"
+    | "pycharm"
+    | "phpstorm"
+    | "rubymine"
+    | "sublime"
+    | "vim"
+    | "visualstudio"
+    | "webstorm"
+    | "cursor"
+    | string;
 }
 ```
 
-### Example
+### 示例
 
-- [Vue2](https://github.com/webfansplz/vite-plugin-vue-inspector/tree/main/packages/playground/vue2)
-- [Vue3](https://github.com/webfansplz/vite-plugin-vue-inspector/tree/main/packages/playground/vue3)
-- [Nuxt3](https://github.com/webfansplz/vite-plugin-vue-inspector/tree/main/packages/playground/nuxt)
+- [Vue2](https://github.com/aifuqiang02/vite-plugin-vue-inspector/tree/main/packages/playground/vue2)
+- [Vue3](https://github.com/aifuqiang02/vite-plugin-vue-inspector/tree/main/packages/playground/vue3)
+- [Nuxt3](https://github.com/aifuqiang02/vite-plugin-vue-inspector/tree/main/packages/playground/nuxt)
 
-## Supported editors
+## 支持的编辑器
 
-| Value | Editor | Linux | Windows | OSX |
-|--------|------|:------:|:------:|:------:|
-| `appcode` | [AppCode](https://www.jetbrains.com/objc/) |  |  |✓|
-| `atom` | [Atom](https://atom.io/) |✓|✓|✓|
-| `atom-beta` | [Atom Beta](https://atom.io/beta) |  |  |✓|
-| `brackets` | [Brackets](http://brackets.io/) |✓|✓|✓|
-| `clion` | [Clion](https://www.jetbrains.com/clion/) |  |✓|✓|
-| `code` | [Visual Studio Code](https://code.visualstudio.com/) |✓|✓|✓|
-| `code-insiders` | [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) |✓|✓|✓|
-| `codium` | [VSCodium](https://github.com/VSCodium/vscodium) |✓|✓|✓|
-| `emacs` | [Emacs](https://www.gnu.org/software/emacs/) |✓| | |
-| `idea` | [IDEA](https://www.jetbrains.com/idea/) |✓|✓|✓|
-| `notepad++` | [Notepad++](https://notepad-plus-plus.org/download/v7.5.4.html) | |✓| |
-| `pycharm` | [PyCharm](https://www.jetbrains.com/pycharm/) |✓|✓|✓|
-| `phpstorm` | [PhpStorm](https://www.jetbrains.com/phpstorm/) |✓|✓|✓|
-| `rubymine` | [RubyMine](https://www.jetbrains.com/ruby/) |✓|✓|✓|
-| `sublime` | [Sublime Text](https://www.sublimetext.com/) |✓|✓|✓|
-| `vim` | [Vim](http://www.vim.org/) |✓| | |
-| `visualstudio` | [Visual Studio](https://www.visualstudio.com/vs/) | | |✓|
-| `webstorm` | [WebStorm](https://www.jetbrains.com/webstorm/) |✓|✓|✓|
-| `cursor` | [Cursor](https://www.cursor.com/) |✓|✓|✓|
+| 值              | 编辑器                                                                 | Linux | Windows | OSX |
+| --------------- | ---------------------------------------------------------------------- | :---: | :-----: | :-: |
+| `appcode`       | [AppCode](https://www.jetbrains.com/objc/)                             |       |         |  ✓  |
+| `atom`          | [Atom](https://atom.io/)                                               |   ✓   |    ✓    |  ✓  |
+| `brackets`      | [Brackets](http://brackets.io/)                                        |   ✓   |    ✓    |  ✓  |
+| `clion`         | [Clion](https://www.jetbrains.com/clion/)                              |       |    ✓    |  ✓  |
+| `code`          | [Visual Studio Code](https://code.visualstudio.com/)                   |   ✓   |    ✓    |  ✓  |
+| `code-insiders` | [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) |   ✓   |    ✓    |  ✓  |
+| `codium`        | [VSCodium](https://github.com/VSCodium/vscodium)                       |   ✓   |    ✓    |  ✓  |
+| `emacs`         | [Emacs](https://www.gnu.org/software/emacs/)                           |   ✓   |         |     |
+| `idea`          | [IDEA](https://www.jetbrains.com/idea/)                                |   ✓   |    ✓    |  ✓  |
+| `notepad++`     | [Notepad++](https://notepad-plus-plus.org/download/v7.5.4.html)        |       |    ✓    |     |
+| `pycharm`       | [PyCharm](https://www.jetbrains.com/pycharm/)                          |   ✓   |    ✓    |  ✓  |
+| `phpstorm`      | [PhpStorm](https://www.jetbrains.com/phpstorm/)                        |   ✓   |    ✓    |  ✓  |
+| `rubymine`      | [RubyMine](https://www.jetbrains.com/ruby/)                            |   ✓   |    ✓    |  ✓  |
+| `sublime`       | [Sublime Text](https://www.sublimetext.com/)                           |   ✓   |    ✓    |  ✓  |
+| `vim`           | [Vim](http://www.vim.org/)                                             |   ✓   |         |     |
+| `visualstudio`  | [Visual Studio](https://www.visualstudio.com/vs/)                      |       |         |  ✓  |
+| `webstorm`      | [WebStorm](https://www.jetbrains.com/webstorm/)                        |   ✓   |    ✓    |  ✓  |
+| `cursor`        | [Cursor](https://www.cursor.com/)                                      |   ✓   |    ✓    |  ✓  |
 
-## 🔌  Configuration IDE / Editor
+## 🔌 配置 IDE / 编辑器
 
-**Starting from v5.1.0, We recommend using the `launchEditor` option configuration to specify the IDE** (Please ensure that the editor's environment variables are correctly configured beforehand.)
+**从 v5.1.0 开始，建议使用 `launchEditor` 选项配置指定 IDE**（请确保编辑器环境变量已正确配置。）
 
-It uses an **environment variable** named **`LAUNCH_EDITOR`** to specify an IDE application, but if you do not set this variable, it will try to open a common IDE that you have open or installed once it is certified.
+它使用名为 **`LAUNCH_EDITOR`** 的环境变量来指定 IDE 应用程序。如果未设置此变量，它将尝试打开您打开或安装的常见 IDE。
 
-For example, if you want it always open VS Code when inspection clicked, set `export LAUNCH_EDITOR=code` in your shell.
-
+例如，如果希望始终在单击检查时打开 VS Code，请在 shell 中设置 `export LAUNCH_EDITOR=code`。
 
 ### VS Code
 
-- install VS Code command line tools, [see the official docs](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line)
+- 安装 VS Code 命令行工具，[查看官方文档](https://code.visualstudio.com/docs/setup/mac#_launching_from_the_command_line)
   ![install-vscode-cli](./public/install-vscode-cli.png)
 
-- set env to shell, like `.bashrc` or `.zshrc`  
+- 在 shell 中设置环境变量，如 `.bashrc` 或 `.zshrc`
 
   ```bash
   export LAUNCH_EDITOR=code
@@ -224,12 +255,11 @@ For example, if you want it always open VS Code when inspection clicked, set `ex
 
 <br />
 
+### VS Code + WSL (Windows)
 
-### VS Code with WSL (Windows)
+- 在 `settings.json` 中添加配置
 
-- add the configuration in the `settings.json`
-
-- restart the VS Code (All Windows should be closed to take effect)
+- 重启 VS Code（所有窗口关闭后生效）
 
 ```json
 {
@@ -241,20 +271,19 @@ For example, if you want it always open VS Code when inspection clicked, set `ex
 }
 ```
 
+### WebStorm
 
-### WebStorm  
-
-- just set env with an absolute path to shell, like `.bashrc` or `.zshrc` (only MacOS)  
+- 只需在 shell 中设置绝对路径环境变量，如 `.bashrc` 或 `.zshrc`（仅 MacOS）
 
   ```bash
   export LAUNCH_EDITOR='/Applications/WebStorm.app/Contents/MacOS/webstorm'
   ```
 
-**OR**
+**或者**
 
-- install WebStorm command line tools
+- 安装 WebStorm 命令行工具
 
-- then set env to shell, like `.bashrc` or `.zshrc`  
+- 然后在 shell 中设置环境变量，如 `.bashrc` 或 `.zshrc`
 
   ```bash
   export LAUNCH_EDITOR=webstorm
@@ -264,18 +293,16 @@ For example, if you want it always open VS Code when inspection clicked, set `ex
 
 ### PhpStorm
 
-- just set env with an absolute path to shell, like `.bashrc` or `.zshrc` (only MacOS)
-
+- 只需在 shell 中设置绝对路径环境变量，如 `.bashrc` 或 `.zshrc`（仅 MacOS）
   ```bash
   export LAUNCH_EDITOR='/Applications/PhpStorm.app/Contents/MacOS/phpstorm'
   ```
 
-**OR**
+**或者**
 
-- install PhpStorm command line tools
+- 安装 PhpStorm 命令行工具
 
-- then set env to shell, like `.bashrc` or `.zshrc`
-
+- 然后在 shell 中设置环境变量，如 `.bashrc` 或 `.zshrc`
   ```bash
   export LAUNCH_EDITOR=phpstorm
   ```
@@ -284,7 +311,7 @@ For example, if you want it always open VS Code when inspection clicked, set `ex
 
 ### Vim
 
-Yes! you can also use vim if you want, just set env to shell
+当然也可以使用 vim，只需在 shell 中设置环境变量
 
 ```bash
 export LAUNCH_EDITOR=vim
@@ -292,38 +319,78 @@ export LAUNCH_EDITOR=vim
 
 <br />
 
-## 💡 Notice
+## 💡 注意
 
-- **[BREAKING CHANGE] From v1.0, `enabled` option default value changed from `true` to `false` .**
-- It only work in develop mode .
-- It does not currently support `Template Engine (e.g. pug)` .
+- **[破坏性更改] 从 v1.0 开始，`enabled` 选项的默认值从 `true` 改为 `false`。**
+- 仅在开发模式下工作。
+- 目前不支持 `Template Engine（如 pug）`。
 
-## 👨‍💻 Programmatic Usage
+## 👨‍💻 编程式使用
 
-You can also use control inspector programmatically, by accessing the `__VUE_INSPECTOR__` global variable.
+你也可以通过访问 `__VUE_INSPECTOR__` 全局变量来编程式控制检查器。
 
 ```ts
-import type { VueInspectorClient } from 'vite-plugin-vue-inspector'
+import type { VueInspectorClient } from "vite-plugin-vue-inspector-ai";
 
-const inspector: VueInspectorClient = window.__VUE_INSPECTOR__
+const inspector: VueInspectorClient = window.__VUE_INSPECTOR__;
 
 if (inspector) {
-  // enable inspector
-  inspector.enable()
-  // or
-  inspector.disable()
+  // 启用检查器
+  inspector.enable();
+  // 或
+  inspector.disable();
 }
 ```
 
-## 🌸 Credits
+## 🚀 开发与发布
 
-This project is inspired by [react-dev-inspector](https://github.com/zthxxx/react-dev-inspector) .
+### 开发
 
-Partially implementation is inspired by [vite-plugin-svelte-inspector](https://github.com/sveltejs/vite-plugin-svelte/tree/main/packages/vite-plugin-svelte-inspector) .
+```bash
+# 安装依赖
+pnpm install
 
-## 🤖️ Analysis of Theory
+# 构建核心包
+cd packages/core
+pnpm build
+```
 
-[Chinese] [点击页面元素,这个Vite插件帮我打开了Vue组件](https://juejin.cn/post/7077347158545924127)
-## 📄 License
+### 发布到 npm
+
+1. **创建 npm Token**
+   - 访问 [npm Access Tokens](https://www.npmjs.com/settings/-/tokens)
+   - 创建一个新的 **Granular Access Token**，具有 read/write 权限
+
+2. **在核心包中配置 `.npmrc`**
+
+创建 `packages/core/.npmrc`:
+
+```bash
+registry=https://registry.npmjs.org/
+//registry.npmjs.org/:_authToken=YOUR_NPM_TOKEN
+```
+
+3. **构建和发布**
+
+```bash
+# 更新 package.json 中的版本号
+# 构建
+cd packages/core
+pnpm build
+
+# 发布到 npm
+cd packages/core
+npm publish --access public
+```
+
+## 🌸 致谢
+
+本项目灵感来自 [react-dev-inspector](https://github.com/zthxxx/react-dev-inspector)。
+
+部分实现参考了 [vite-plugin-svelte-inspector](https://github.com/sveltejs/vite-plugin-svelte/tree/main/packages/vite-plugin-svelte-inspector)。
+
+基于 [vite-plugin-vue-inspector](https://github.com/webfansplz/vite-plugin-vue-inspector) 分支。
+
+## 📄 许可证
 
 [MIT LICENSE](./LICENSE)

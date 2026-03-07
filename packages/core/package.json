@@ -1,16 +1,17 @@
 {
-  "name": "vite-plugin-vue-inspector",
-  "version": "5.3.2",
-  "description": "jump to local IDE source code while click the element of browser automatically.",
-  "author": "webfansplz",
+  "name": "vite-plugin-vue-inspector-ai",
+  "version": "1.0.29",
+  "description": "Vue Inspector with enhanced features - supports end line and clipboard copy",
+  "readme": "../README.md",
+  "author": "aifuqiang02",
   "license": "MIT",
-  "homepage": "https://github.com/webfansplz/vite-plugin-vue-inspector#readme",
+  "homepage": "https://github.com/aifuqiang02/vite-plugin-vue-inspector#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webfansplz/vite-plugin-vue-inspector.git"
+    "url": "git+https://github.com/aifuqiang02/vite-plugin-vue-inspector.git"
   },
   "bugs": {
-    "url": "https://github.com/webfansplz/vite-plugin-vue-inspector/issues"
+    "url": "https://github.com/aifuqiang02/vite-plugin-vue-inspector/issues"
   },
   "keywords": [
     "vue",
