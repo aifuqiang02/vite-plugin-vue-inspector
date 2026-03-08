@@ -2,7 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 import process from 'node:process'
-import { bold, dim, green, yellow } from 'kolorist'
+import { bold, green, yellow } from 'kolorist'
 import { normalizePath } from 'vite'
 import type { PluginOption, ResolvedConfig } from 'vite'
 import MagicString from 'magic-string'
@@ -33,28 +33,10 @@ export interface VueInspectorClient {
 
 export interface VitePluginInspectorOptions {
   /**
-   * Vue version
-   * @default 3
-   */
-  vue?: 2 | 3
-
-  /**
-   * Default enable state
+   * Default enable state for sticky mode
    * @default false
    */
   enabled?: boolean
-
-  /**
-   * Define a combo key to toggle inspector
-   * @default 'control-shift' on windows, 'meta-shift' on other os
-   *
-   * any number of modifiers `control` `shift` `alt` `meta` followed by zero or one regular key, separated by -
-   * examples: control-shift, control-o, control-alt-s  meta-x control-meta
-   * Some keys have native behavior (e.g. alt-s opens history menu on firefox).
-   * To avoid conflicts or accidentally typing into inputs, modifier only combinations are recommended.
-   * You can also disable it by setting `false`.
-   */
-  toggleComboKey?: string | false
 
   /**
    * Toggle button visibility
@@ -69,10 +51,8 @@ export interface VitePluginInspectorOptions {
   toggleButtonPos?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
 
   /**
-   * append an import to the module id ending with `appendTo` instead of adding a script into body
-   * useful for frameworks that do not support transformIndexHtml hook (e.g. Nuxt3)
-   *
-   * WARNING: only set this if you know exactly what it does.
+   * Append an import to the module id ending with `appendTo` instead of adding a script into body
+   * Useful for frameworks that do not support transformIndexHtml hook (e.g. Nuxt3)
    */
   appendTo?: string | RegExp
 
@@ -84,29 +64,25 @@ export interface VitePluginInspectorOptions {
   openInEditorHost?: string | false
 
   /**
-   * lazy load inspector times (ms)
+   * Lazy load inspector time (ms)
    * @default false
    */
   lazyLoad?: number | false
 
   /**
-   * disable inspector on editor open
+   * Disable inspector on editor open
    * @default false
    */
   disableInspectorOnEditorOpen?: boolean
 
   /**
    * Hide information in VNode and produce clean html in DevTools
-   *
-   * Currently, it only works for Vue 3
-   *
    * @default true
    */
   cleanHtml?: boolean
 
   /**
    * Target editor when open in editor (v5.1.0+)
-   *
    * @default process.env.LAUNCH_EDITOR ?? code (Visual Studio Code)
    */
   launchEditor?: 'appcode' | 'atom' | 'atom-beta' | 'brackets' | 'clion' | 'code' | 'code-insiders' | 'codium' | 'emacs' | 'idea' | 'notepad++' | 'pycharm' | 'phpstorm' | 'rubymine' | 'sublime' | 'vim' | 'visualstudio' | 'webstorm' | 'rider' | 'cursor' | string
@@ -118,25 +94,13 @@ export interface VitePluginInspectorOptions {
   reduceMotion?: boolean
 }
 
-const toggleComboKeysMap = {
-  control: process.platform === 'darwin' ? 'Control(^)' : 'Ctrl(^)',
-  meta: 'Command(⌘)',
-  shift: 'Shift(⇧)',
-}
-
 function getInspectorPath() {
   const pluginPath = normalizePath(path.dirname(fileURLToPath(import.meta.url)))
   return pluginPath.replace(/\/dist$/, '/src')
 }
 
-export function normalizeComboKeyPrint(toggleComboKey: string) {
-  return toggleComboKey.split('-').map(key => toggleComboKeysMap[key] || key[0].toUpperCase() + key.slice(1)).join(dim('+'))
-}
-
 export const DEFAULT_INSPECTOR_OPTIONS: VitePluginInspectorOptions = {
-  vue: 3,
   enabled: false,
-  toggleComboKey: process.platform === 'darwin' ? 'meta-shift' : 'control-shift',
   toggleButtonVisibility: 'active',
   toggleButtonPos: 'top-right',
   appendTo: '',
@@ -154,9 +118,8 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
   let config: ResolvedConfig
 
   const {
-    vue,
     appendTo,
-    cleanHtml = vue === 3, // Only enabled for Vue 3 by default
+    cleanHtml = true,
   } = normalizedOptions
 
   if (normalizedOptions.launchEditor)
@@ -164,37 +127,33 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
 
   return [
     {
-      name: 'vite-plugin-vue-inspector',
+      name: 'vite-plugin-vue-inspector-ai',
       enforce: 'pre',
       apply(_, { command }) {
-        // apply only on serve and not for test
         return command === 'serve' && process.env.NODE_ENV !== 'test'
       },
       async resolveId(importee: string) {
-        if (importee.startsWith('virtual:vue-inspector-options')) {
+        if (importee.startsWith('virtual:vue-inspector-options'))
           return importee
-        }
-        else if (importee.startsWith('virtual:vue-inspector-path:')) {
-          const resolved = importee.replace('virtual:vue-inspector-path:', `${inspectorPath}/`)
-          return resolved
-        }
+        if (importee.startsWith('virtual:vue-inspector-path:'))
+          return importee.replace('virtual:vue-inspector-path:', `${inspectorPath}/`)
       },
-
       async load(id) {
-        if (id === 'virtual:vue-inspector-options') {
+        if (id === 'virtual:vue-inspector-options')
           return `export default ${JSON.stringify({ ...normalizedOptions, base: config.base })}`
-        }
-        else if (id.startsWith(inspectorPath)) {
-          const { query } = parseVueRequest(id)
-          if (query.type)
-            return
-          // read file ourselves to avoid getting shut out by vites fs.allow check
-          const file = idToFile(id)
-          if (fs.existsSync(file))
-            return await fs.promises.readFile(file, 'utf-8')
-          else
-            console.error(`failed to find file for vue-inspector: ${file}, referenced by id ${id}.`)
-        }
+
+        if (!id.startsWith(inspectorPath))
+          return
+
+        const { query } = parseVueRequest(id)
+        if (query.type)
+          return
+
+        const file = idToFile(id)
+        if (fs.existsSync(file))
+          return await fs.promises.readFile(file, 'utf-8')
+
+        console.error(`failed to find file for vue-inspector: ${file}, referenced by id ${id}.`)
       },
       transform(code, id) {
         const { filename, query } = parseVueRequest(id)
@@ -214,13 +173,12 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
       },
       configureServer(server) {
         const _printUrls = server.printUrls
-        const { toggleComboKey } = normalizedOptions
+        const holdKey = process.platform === 'darwin' ? 'Cmd' : 'Ctrl'
 
-        toggleComboKey && (server.printUrls = () => {
-          const keys = normalizeComboKeyPrint(toggleComboKey)
+        server.printUrls = () => {
           _printUrls()
-          console.log(`  ${green('➜')}  ${bold('Vue Inspector')}: ${green(`Press ${yellow(keys)} in App to toggle the Inspector`)}\n`)
-        })
+          console.log(`  ${green('➜')}  ${bold('Vue Inspector')}: ${green(`Hold ${yellow(holdKey)} in App to inspect components`)}\n`)
+        }
       },
       transformIndexHtml(html) {
         if (appendTo)
@@ -244,11 +202,10 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
       },
     },
     {
-      name: 'vite-plugin-vue-inspector:post',
+      name: 'vite-plugin-vue-inspector-ai:post',
       enforce: 'post',
       apply(_, { command }) {
-        // apply only on serve and not for test
-        return cleanHtml && vue === 3 && command === 'serve' && process.env.NODE_ENV !== 'test'
+        return cleanHtml && command === 'serve' && process.env.NODE_ENV !== 'test'
       },
       transform(code) {
         if (code.includes('_interopVNode'))
@@ -267,7 +224,7 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
         if (!fn.size)
           return
 
-        s.appendLeft(0, `/* Injection by vite-plugin-vue-inspector Start */
+        s.appendLeft(0, `/* Injection by vite-plugin-vue-inspector-ai Start */
 import { ${Array.from(fn.values()).map(i => `${i} as __${i}`).join(',')} } from 'vue'
 function _interopVNode(vnode) {
   if (vnode && vnode.props && 'data-v-inspector' in vnode.props) {
@@ -278,7 +235,7 @@ function _interopVNode(vnode) {
   return vnode
 }
 ${Array.from(fn.values()).map(i => `function _${i}(...args) { return _interopVNode(__${i}(...args)) }`).join('\n')}
-/* Injection by vite-plugin-vue-inspector End */
+/* Injection by vite-plugin-vue-inspector-ai End */
 `)
 
         return {
@@ -290,3 +247,4 @@ ${Array.from(fn.values()).map(i => `function _${i}(...args) { return _interopVNo
   ]
 }
 export default VitePluginInspector
+

@@ -1,4 +1,4 @@
-# vite-plugin-vue-inspector
+# vite-plugin-vue-inspector-ai
 
 ## 5.3.2
 

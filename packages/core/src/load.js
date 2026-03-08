@@ -20,25 +20,15 @@ function load() {
   if (!isClient)
     return
   createInspectorContainer()
-  const { vue } = inspectorOptions
-  // vue 2/3 compatibility
-  vue === 3
-    ? Vue.createApp({
-      render: () => Vue.h(App),
-      devtools: {
-        hide: true,
-      },
-    }).mount(`#${CONTAINER_ID}`)
-    : new Vue.default({
-      render: h => h(App),
-      devtools: {
-        hide: true,
-      },
-    }).$mount(`#${CONTAINER_ID}`)
+  Vue.createApp({
+    render: () => Vue.h(App),
+    devtools: {
+      hide: true,
+    },
+  }).mount(`#${CONTAINER_ID}`)
 }
 
 if (inspectorOptions.lazyLoad)
   setTimeout(load, inspectorOptions.lazyLoad)
-
 else
   load()

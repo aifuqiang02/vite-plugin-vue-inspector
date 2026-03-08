@@ -8,7 +8,6 @@
   },
   "devDependencies": {
     "nuxt": "3.7.4",
-    "unplugin-vue-inspector": "workspace:*",
-    "vite-plugin-vue-inspector": "workspace:*"
+    "vite-plugin-vue-inspector-ai": "workspace:*"
   }
 }

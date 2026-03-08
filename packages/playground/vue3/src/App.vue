@@ -23,7 +23,7 @@ export default {
       <!--  -->
       <!--  -->
       <p>Vite so awesome 🔥 .</p>
-      <a href="https://github.com/webfansplz/vite-plugin-vue-inspector">Give me a star if it helps you 💗 .</a>
+      <a href="https://github.com/aifuqiang02/vite-plugin-vue-inspector-ai">Give me a star if it helps you 💗 .</a>
     </div>
   </div>
 </template>
@@ -44,3 +44,4 @@ p
   color: #35495d
   cursor: pointer
 </style>
+
