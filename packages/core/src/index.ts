@@ -177,7 +177,7 @@ function VitePluginInspector(options: VitePluginInspectorOptions = DEFAULT_INSPE
 
         server.printUrls = () => {
           _printUrls()
-          console.log(`  ${green('➜')}  ${bold('Vue Inspector')}: ${green(`Hold ${yellow(holdKey)} in App to inspect components`)}\n`)
+          console.log(`  ${green('➜')}  ${bold('Vue Inspector')}: ${green(`在页面中按住 ${yellow(holdKey)} 键即可检查组件`)}\n`)
         }
       },
       transformIndexHtml(html) {

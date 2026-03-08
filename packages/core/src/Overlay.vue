@@ -25,6 +25,7 @@ export default {
     return {
       manualEnabled: inspectorOptions.enabled,
       holdEnabled: false,
+      requireActivationReset: false,
       disableInspectorOnEditorOpen:
         inspectorOptions.disableInspectorOnEditorOpen,
       overlayVisible: false,
@@ -51,6 +52,7 @@ export default {
   },
   computed: {
     enabled() {
+      if (this.requireActivationReset) return false;
       return this.manualEnabled || this.holdEnabled;
     },
     activationKeyLabel() {
@@ -103,12 +105,12 @@ export default {
       };
     },
     bannerTip() {
-      return `Hold ${this.activationKeyLabel} to inspect. Click the badge for sticky mode.`;
+      return `按住 ${this.activationKeyLabel} 键开始检查，点击按钮可手动开关检查模式。`;
     },
     floatsTip() {
       return this.manualEnabled
-        ? `Click to copy. ${this.activationKeyLabel}+Click opens IDE.`
-        : "Click to copy component location.";
+        ? `点击复制，${this.activationKeyLabel}+点击可在 IDE 中打开。`
+        : "点击复制组件位置信息。";
     },
   },
   watch: {
@@ -151,18 +153,24 @@ export default {
       listener?.call(window, "resize", this.closeOverlay, true);
     },
     toggleEnabled() {
+      this.requireActivationReset = false;
       this.manualEnabled = !this.manualEnabled;
       if (!this.enabled) this.closeOverlay();
     },
     onKeydown(event) {
+      if (this.requireActivationReset) return;
       this.holdEnabled = this.isInspectModifierPressed(event);
     },
     onKeyup(event) {
       this.holdEnabled = this.isInspectModifierPressed(event);
+      if (!this.isInspectModifierPressed(event)) {
+        this.requireActivationReset = false;
+      }
       if (!this.enabled) this.closeOverlay();
     },
     resetHoldActivation() {
       this.holdEnabled = false;
+      this.requireActivationReset = false;
       if (!this.enabled) this.closeOverlay();
     },
     isMacPlatform() {
@@ -217,6 +225,9 @@ export default {
 
       const { file, line, column, endLine } = params;
       this.overlayVisible = false;
+      this.manualEnabled = false;
+      this.holdEnabled = false;
+      this.requireActivationReset = true;
 
       const clipboardText = `Vue组件: ${file} | 起始行: ${line} | 结束行: ${endLine}\n`;
       navigator.clipboard
@@ -314,7 +325,7 @@ export default {
         @click.prevent.stop="toggleEnabled"
       >
         <span class="vue-inspector-dot" :class="{ 'is-active': enabled }" />
-        <span>Inspector AI</span>
+        <span>组件检查</span>
       </button>
       <a
         :style="bannerPosition"

@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vue-inspector-ai",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Vue Inspector with enhanced features - supports end line and clipboard copy",
   "readme": "../README.md",
   "author": "aifuqiang02",
